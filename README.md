@@ -14,3 +14,7 @@ Prjctr Go course. Mock order service project.
 - REST API
 - uses repository pattern for entity persistence
 - strives to follow clean architecture practices (decoupling via interfaces)
+
+## Deployment
+- deployed as binary
+- webservice listens on port :8081
