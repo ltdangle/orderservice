@@ -3,8 +3,9 @@ package entity
 import "time"
 
 type Order struct {
-	customerId string
-	products   []Product
-	paymentId  string
-	createdAt  time.Time
+	Uuid       string
+	CustomerId string
+	Products   []Product
+	PaymentId  string
+	CreatedAt  time.Time
 }
