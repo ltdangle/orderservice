@@ -1,17 +1,16 @@
 package actions
 
-import "orders/entity"
+import (
+	"orders/model/write"
+)
 
-type OrderCreator interface {
-	Create() *entity.Order
-}
-
+// Action interfaces to be implemented.
 type ProductAdder interface {
-	AddProduct(order *entity.Order, product *entity.Product)
+	AddProduct(order *write.Order, product *write.OrderItem)
 }
 
 type ProductDeleter interface {
-	DeleteProduct(order *entity.Order, productId string)
+	DeleteProduct(order *write.Order, productId string)
 }
 
 type ProductConfirmer interface {
@@ -19,9 +18,9 @@ type ProductConfirmer interface {
 }
 
 type OrderCalculator interface {
-	Total(order *entity.Order)
+	Total(order *write.Order)
 }
 
 type PaymentConfirmer interface {
-	Confirm(payment *entity.Payment)
+	Confirm(payment *write.Payment)
 }
