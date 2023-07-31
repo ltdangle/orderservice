@@ -2,10 +2,7 @@ package actions
 
 import "orders/entity"
 
-type OrderCreator interface {
-	Create() *entity.Order
-}
-
+// Action interfaces to be implemented.
 type ProductAdder interface {
 	AddProduct(order *entity.Order, product *entity.Product)
 }
