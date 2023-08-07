@@ -1,21 +1,25 @@
 package rest
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"orders/actions"
+	"orders/infra/cache"
+
+	"github.com/gorilla/mux"
 )
 
 // Create order controller.
 type RetrieveOrder struct {
 	action *actions.RetrieveOrder
+	cache  cache.Cache
 	rspndr *Responder
 }
 
 // Constructor.
-func NewRetrieveOrder(action *actions.RetrieveOrder, rspndr *Responder) *RetrieveOrder {
+func NewRetrieveOrder(action *actions.RetrieveOrder, cache cache.Cache, rspndr *Responder) *RetrieveOrder {
 	return &RetrieveOrder{
 		action: action,
+		cache:  cache,
 		rspndr: rspndr,
 	}
 }

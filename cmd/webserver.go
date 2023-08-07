@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"orders/actions"
+	"orders/infra/cache"
 	"orders/model/read"
 	"orders/model/write"
 	"orders/rest"
@@ -44,9 +45,12 @@ func main() {
 		log.Fatal(errr.Error())
 	}
 
+	// Cache.
+
+	c := cache.NewCacheRedis("tcp", "127.0.0.1:6379", 10)
 	// New order controller.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
-	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
+	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), c, respndr)
 
 	// Router and server.
 	r := mux.NewRouter()

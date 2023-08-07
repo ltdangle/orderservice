@@ -3,11 +3,9 @@ package cache
 import "github.com/mediocregopher/radix/v3"
 
 // Cache interfaces.
-type GetCache interface {
+type Cache interface {
 	Get(key string) (string, error)
-}
-type SetCache interface {
-	Set(key string, value string)
+	Set(key string, value string) error
 }
 
 // Redis cache implementation.
@@ -15,7 +13,7 @@ type RedisCache struct {
 	p *radix.Pool
 }
 
-func NewGetCacheRedis(network string, addr string, size int) *RedisCache {
+func NewCacheRedis(network string, addr string, size int) *RedisCache {
 	p, err := radix.NewPool(network, addr, size)
 	if err != nil {
 		panic(err.Error())
