@@ -5,7 +5,12 @@ import (
 	"encoding/gob"
 )
 
-func EncodeToString(v interface{}) (string, error) {
+type GobSerializer struct{}
+
+func NewGobSerializer() *GobSerializer {
+	return &GobSerializer{}
+}
+func (g *GobSerializer) EncodeToString(v interface{}) (string, error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	err := enc.Encode(v)
@@ -15,7 +20,7 @@ func EncodeToString(v interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-func DecodeFromString(s string, v interface{}) error {
+func (g *GobSerializer) DecodeFromString(s string, v interface{}) error {
 	buf := bytes.NewBufferString(s)
 	dec := gob.NewDecoder(buf)
 	return dec.Decode(v)

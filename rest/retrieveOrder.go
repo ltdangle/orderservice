@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"orders/actions"
 	"orders/model/read"
-	"orders/util"
 )
 
 // ICache interface.
@@ -14,19 +13,27 @@ type ICache interface {
 	Set(key string, value string) error
 }
 
-// Create order controller.
-type RetrieveOrder struct {
-	action *actions.RetrieveOrder
-	cache  ICache
-	rspndr *Responder
+// ISerializer interface.
+type ISerializer interface {
+	EncodeToString(v interface{}) (string, error)
+	DecodeFromString(s string, v interface{}) error
 }
 
-// Constructor.
-func NewRetrieveOrder(action *actions.RetrieveOrder, cache ICache, rspndr *Responder) *RetrieveOrder {
+// RetrieveOrder controller.
+type RetrieveOrder struct {
+	action     *actions.RetrieveOrder
+	serializer ISerializer
+	cache      ICache
+	rspndr     *Responder
+}
+
+// NewRetrieveOrder constructor.
+func NewRetrieveOrder(action *actions.RetrieveOrder, serializer ISerializer, cache ICache, rspndr *Responder) *RetrieveOrder {
 	return &RetrieveOrder{
-		action: action,
-		cache:  cache,
-		rspndr: rspndr,
+		action:     action,
+		serializer: serializer,
+		cache:      cache,
+		rspndr:     rspndr,
 	}
 }
 
@@ -40,7 +47,7 @@ func (c *RetrieveOrder) Retrieve(w http.ResponseWriter, r *http.Request) {
 	cachedString, err := c.cache.Get(uuid)
 	// Cache exists.
 	if err == nil {
-		err = util.DecodeFromString(cachedString, &order)
+		err = c.serializer.DecodeFromString(cachedString, &order)
 		if err != nil {
 			c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
 			return
@@ -57,7 +64,7 @@ func (c *RetrieveOrder) Retrieve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Cache order.
-	encodedOrder, _ := util.EncodeToString(order)
+	encodedOrder, _ := c.serializer.EncodeToString(order)
 	err = c.cache.Set(uuid, encodedOrder)
 	if err != nil {
 		c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
