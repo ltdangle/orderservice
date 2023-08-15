@@ -1,12 +1,9 @@
 package cache
 
-import "github.com/mediocregopher/radix/v3"
-
-// Cache interfaces.
-type Cache interface {
-	Get(key string) (string, error)
-	Set(key string, value string) error
-}
+import (
+	"errors"
+	"github.com/mediocregopher/radix/v3"
+)
 
 // Redis cache implementation.
 type RedisCache struct {
@@ -33,11 +30,16 @@ func (r *RedisCache) Get(key string) (string, error) {
 		return "", err
 	}
 
+	if result == "" {
+		return "", errors.New("cache key " + key + " not found")
+	}
+
 	return result, nil
 }
 
 func (r *RedisCache) Set(key string, value string) error {
 	err := r.p.Do(radix.Cmd(nil, "SET", key, value))
+
 	if err != nil {
 		return err
 	}

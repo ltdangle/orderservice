@@ -3,16 +3,15 @@ package read
 import (
 	"database/sql"
 	"log"
-	"time"
 )
 
 type Order struct {
-	Uuid        string
-	CustomerId  string
-	PaymentId   string
-	PaymentDate time.Time
+	Uuid        sql.NullString
+	CustomerId  sql.NullString
+	PaymentId   sql.NullString
+	PaymentDate sql.NullTime
 	Items       []OrderItem
-	CreatedAt   time.Time
+	CreatedAt   sql.NullTime
 }
 
 type OrderFinderById interface {
@@ -38,7 +37,7 @@ func (f FinderById) Find(uuid string) (*Order, error) {
 	stmt, err := f.db.Prepare(`
 SELECT orders.uuid, orders.created_at, p.payment_id, p.date
 FROM orders 
-JOIN payments p 
+LEFT JOIN payments p 
 ON orders.uuid = p.order_id
 WHERE orders.uuid = ?;
 `)

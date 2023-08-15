@@ -46,8 +46,8 @@ func main() {
 	}
 
 	// Cache.
-
 	c := cache.NewCacheRedis("tcp", "127.0.0.1:6379", 10)
+
 	// New order controller.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
 	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), c, respndr)
