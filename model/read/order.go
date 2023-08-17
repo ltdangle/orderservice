@@ -38,7 +38,7 @@ func (f FinderById) Find(uuid string) (*Order, error) {
 	stmt, err := f.db.Prepare(`
 SELECT orders.uuid, orders.created_at, p.payment_id, p.date
 FROM orders 
-JOIN payments p 
+LEFT JOIN payments p 
 ON orders.uuid = p.order_id
 WHERE orders.uuid = ?;
 `)
