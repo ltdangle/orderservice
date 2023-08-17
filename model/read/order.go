@@ -3,16 +3,15 @@ package read
 import (
 	"database/sql"
 	"log"
-	"time"
 )
 
 type Order struct {
-	Uuid        string
-	CustomerId  string
-	PaymentId   string
-	PaymentDate time.Time
+	Uuid        sql.NullString
+	CustomerId  sql.NullString
+	PaymentId   sql.NullString
+	PaymentDate sql.NullTime
 	Items       []OrderItem
-	CreatedAt   time.Time
+	CreatedAt   sql.NullTime
 }
 
 type OrderFinderById interface {

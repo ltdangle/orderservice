@@ -29,31 +29,36 @@ func main() {
 	}
 
 	// ORM.
-	db, err := gorm.Open(mysql.Open(mysqlDsn), &gorm.Config{})
+	orm, err := gorm.Open(mysql.Open(mysqlDsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	repo := write.NewOrderSaver(db)
+	repo := write.NewOrderSaver(orm)
 
 	// Rest json responder.
 	respndr := rest.NewResponder("2006-01-02 15:04:05")
 
-	// Mysql db connection.
+	// Mysql orm connection.
 	mysqlDb, errr := sql.Open("mysql", mysqlDsn)
 	if errr != nil {
 		log.Fatal(errr.Error())
 	}
 
-	// New order controller.
+	// Model read/write implementations.
+	orderModifier := write.NewOrderModifier(orm)
+	orderItemFinder := read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))
+
+	// Controllers.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
 	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
-	modifyOrderCntrlr := rest.NewOrderModifier(actions.NewOrderActions(write.NewOrderModifier(db), read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
+	modifyOrderCntrlr := rest.NewDeleteProduct(actions.NewProductDeleter(orderModifier, orderItemFinder), respndr)
+	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderItemFinder), respndr)
 
 	// Router and server.
 	r := mux.NewRouter()
 	r.HandleFunc("/create", createOrderCntrlr.Create)
 	r.HandleFunc("/retrieve/{uuid}", retrieveOrderCntrlr.Retrieve)
-	r.HandleFunc("/add-product", modifyOrderCntrlr.AddProduct).Methods("POST")
+	r.HandleFunc("/add-product", addProductCntrl.AddProduct).Methods("POST")
 	r.HandleFunc("/product", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
 
 	srv := &http.Server{
