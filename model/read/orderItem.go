@@ -2,6 +2,7 @@ package read
 
 import (
 	"database/sql"
+	"orders/model/write"
 )
 
 type OrderItem struct {
@@ -60,4 +61,46 @@ WHERE order_items.order_id = ?;
 	}
 
 	return orderItems, nil
+}
+
+type IOrderItemFinderByItemId interface {
+	Find(itemUuid string) (*write.OrderItem, error)
+}
+
+// OrderItemFinderById implementation.
+type OrderItemFinderByItemId struct {
+	db *sql.DB
+}
+
+// NewOrderItemFinderById Constructor.
+func NewOrderItemFinderByItemId(db *sql.DB) *OrderItemFinderByItemId {
+	return &OrderItemFinderByItemId{
+		db: db,
+	}
+}
+
+func (f OrderItemFinderByItemId) Find(itemUuid string) (*write.OrderItem, error) {
+	stmt, err := f.db.Prepare(`
+SELECT *
+FROM order_items
+WHERE uuid = ?;
+`)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(itemUuid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orderItem write.OrderItem
+	err = rows.Scan(&orderItem.Uuid, &orderItem.OrderId, &orderItem.ProductId, &orderItem.Title, &orderItem.Description, &orderItem.Price)
+	if err != nil {
+		return nil, err
+	}
+
+	return &orderItem, nil
 }
