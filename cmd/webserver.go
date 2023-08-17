@@ -47,11 +47,14 @@ func main() {
 	// New order controller.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
 	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
+	modifyOrderCntrlr := rest.NewOrderModifier(actions.NewOrderActions(write.NewOrderModifier(db), read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
 
 	// Router and server.
 	r := mux.NewRouter()
 	r.HandleFunc("/create", createOrderCntrlr.Create)
 	r.HandleFunc("/retrieve/{uuid}", retrieveOrderCntrlr.Retrieve)
+	r.HandleFunc("/add-product", modifyOrderCntrlr.AddProduct).Methods("POST")
+	r.HandleFunc("/product", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
 
 	srv := &http.Server{
 		Handler:      r,
