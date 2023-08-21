@@ -11,6 +11,7 @@ type Order struct {
 	PaymentId   sql.NullString
 	PaymentDate sql.NullTime
 	Items       []OrderItem
+	Status      string
 	CreatedAt   sql.NullTime
 }
 
@@ -58,6 +59,50 @@ WHERE orders.uuid = ?;
 	order.Items, err = f.orderItemFinder.Find(uuid)
 	if err != nil {
 		return nil, err
+	}
+
+	return &order, nil
+}
+
+type OrderFinderActiveById interface {
+	FindActive(uuid string) (*Order, error)
+}
+
+type FinderActiveById struct {
+	db *sql.DB
+}
+
+func NewOrderFinderActiveById(db *sql.DB) *FinderActiveById {
+	return &FinderActiveById{
+		db: db,
+	}
+}
+
+func (f FinderActiveById) FindActive(uuid string) (*Order, error) {
+	stmt, err := f.db.Prepare(`
+SELECT *
+FROM orders
+WHERE status = 'created'
+AND uuid = ?;
+`)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(uuid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var order Order
+	for rows.Next() {
+		err = rows.Scan(&order.Uuid, &order.Status, &order.CustomerId, &order.PaymentId, &order.CreatedAt)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &order, nil

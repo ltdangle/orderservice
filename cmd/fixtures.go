@@ -33,7 +33,7 @@ func main() {
 
 	// Create fixtures.
 	orderUuid := "efc144e4"
-	db.Create(&write.Order{Uuid: orderUuid})
+	db.Create(&write.Order{Uuid: orderUuid, Status: "completed"})
 	db.Create(&write.Payment{Uuid: "8c69", OrderId: orderUuid, PaymentId: "8d7ksk83", Date: time.Now()})
 	db.Create(&write.OrderItem{Uuid: "3abb", OrderId: orderUuid, ProductId: "4ef6", Title: "Product one", Description: "Product one description"})
 	db.Create(&write.OrderItem{Uuid: "3abc", OrderId: orderUuid, ProductId: "4efc", Title: "Product two", Description: "Product two description"})

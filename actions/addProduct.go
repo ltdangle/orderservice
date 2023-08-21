@@ -1,27 +1,25 @@
 package actions
 
 import (
+	"encoding/json"
 	"errors"
-	"github.com/google/uuid"
+	"fmt"
+	"orders/clients"
 	"orders/model/read"
 	"orders/model/write"
 )
 
 type AddProductRequest struct {
-	OrderID string
-}
-
-type DeleteProductRequest struct {
-	OrderID string
-	ItemID  string
+	OrderID   string
+	ProductID string
 }
 
 type ProductAdder struct {
 	repo   write.IOrderModifier
-	finder read.OrderFinderById
+	finder read.OrderFinderActiveById
 }
 
-func NewProductAdder(repo write.IOrderModifier, finder read.OrderFinderById) *ProductAdder {
+func NewProductAdder(repo write.IOrderModifier, finder read.OrderFinderActiveById) *ProductAdder {
 	return &ProductAdder{
 		repo:   repo,
 		finder: finder,
@@ -29,7 +27,7 @@ func NewProductAdder(repo write.IOrderModifier, finder read.OrderFinderById) *Pr
 }
 
 func (action *ProductAdder) AddProduct(r AddProductRequest) (error, *write.OrderItem) {
-	order, err := action.finder.Find(r.OrderID)
+	order, err := action.finder.FindActive(r.OrderID)
 
 	if order == nil {
 		return errors.New("order not found"), nil
@@ -39,14 +37,23 @@ func (action *ProductAdder) AddProduct(r AddProductRequest) (error, *write.Order
 		return err, nil
 	}
 
-	orderItem := write.OrderItem{
-		Uuid:        uuid.New().String(),
-		OrderId:     r.OrderID,
-		ProductId:   uuid.New().String(),
-		Title:       "one more item",
-		Description: "description",
-		Price:       100,
+	err, product := clients.GetProductById(r.ProductID)
+	if err != nil {
+		return err, nil
 	}
+
+	fmt.Println(product)
+
+	orderItem := write.OrderItem{}
+
+	err = json.Unmarshal([]byte(product), &orderItem)
+	if err != nil {
+		return err, nil
+	}
+
+	orderItem.OrderId = r.OrderID
+	orderItem.ProductId = r.ProductID
+	orderItem.Uuid = "47rg4yut"
 
 	err = action.repo.AddItem(&orderItem)
 

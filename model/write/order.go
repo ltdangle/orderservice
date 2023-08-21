@@ -9,6 +9,7 @@ type Order struct {
 	Uuid       string `gorm:"index;unique"`
 	CustomerId string
 	PaymentId  string
+	Status     string
 	CreatedAt  time.Time
 }
 

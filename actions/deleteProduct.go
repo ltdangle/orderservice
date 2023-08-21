@@ -5,6 +5,11 @@ import (
 	"orders/model/write"
 )
 
+type DeleteProductRequest struct {
+	OrderID string
+	ItemID  string
+}
+
 type ProductDeleter struct {
 	repo   write.IOrderModifier
 	finder read.OrderFinderById
