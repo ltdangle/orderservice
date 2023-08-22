@@ -49,18 +49,23 @@ func main() {
 	orderItemFinder := read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))
 	orderActiveFinder := read.NewOrderFinderActiveById(mysqlDb)
 
+	// Actions.
+	retrieveOrderAction := actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb)))
+
 	// Controllers.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
-	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
+	retrieveOrderCntrlr := rest.NewRetrieveOrder(retrieveOrderAction, respndr)
 	modifyOrderCntrlr := rest.NewDeleteProduct(actions.NewProductDeleter(orderModifier, orderItemFinder), respndr)
 	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderActiveFinder), respndr)
+	checkoutCntrlr := rest.NewCheckoutTransfer(actions.NewCheckoutTransfer("http://checkout.url"), retrieveOrderAction, respndr)
 
 	// Router and server.
 	r := mux.NewRouter()
-	r.HandleFunc("/order/create", createOrderCntrlr.Create)
-	r.HandleFunc("/order/retrieve/{uuid}", retrieveOrderCntrlr.Retrieve)
+	r.HandleFunc("/order/create", createOrderCntrlr.Create).Methods("GET")
+	r.HandleFunc("/order/{uuid}", retrieveOrderCntrlr.Retrieve).Methods("GET")
 	r.HandleFunc("/add-product", addProductCntrl.AddProduct).Methods("POST")
 	r.HandleFunc("/product", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
+	r.HandleFunc("/order/{uuid}/checkout", checkoutCntrlr.Checkout).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,
