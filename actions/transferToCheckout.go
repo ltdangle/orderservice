@@ -14,5 +14,5 @@ func NewCheckoutTransfer(url string) *CheckoutTransfer {
 }
 
 func (c *CheckoutTransfer) Url(order *read.Order) string {
-	return c.u + fmt.Sprint("?cart=%s&total=%d", order.Uuid, order.Total)
+	return c.u + fmt.Sprintf("?cart=%s&total=%d", order.Uuid.String, order.Total)
 }
