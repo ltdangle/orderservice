@@ -33,19 +33,25 @@ func (a *ConfirmPayment) Confirm(orderUuid string, paymentUuid string) error {
 		return err
 	}
 
-	// Update payment.
-	payment.PaymentId = paymentUuid
-	payment.OrderId = orderUuid
-	result = a.db.Save(payment)
-	if result.Error != nil {
-		return result.Error
-	}
+	err = a.db.Transaction(func(tx *gorm.DB) error {
+		// Update payment.
+		payment.PaymentId = paymentUuid
+		payment.OrderId = orderUuid
+		result = tx.Save(payment)
+		if result.Error != nil {
+			return result.Error
+		}
 
-	// Update order.
-	order.Status = "paid"
-	order.PaymentId = paymentUuid
+		// Update order.
+		order.Status = "paid"
+		order.PaymentId = paymentUuid
 
-	err = a.orderSaver.Update(order)
+		result = tx.Save(order)
+		if result.Error != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}
