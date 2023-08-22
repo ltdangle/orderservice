@@ -47,17 +47,18 @@ func main() {
 	// Model read/write implementations.
 	orderModifier := write.NewOrderModifier(orm)
 	orderItemFinder := read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))
+	orderActiveFinder := read.NewOrderFinderActiveById(mysqlDb)
 
 	// Controllers.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
 	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), respndr)
 	modifyOrderCntrlr := rest.NewDeleteProduct(actions.NewProductDeleter(orderModifier, orderItemFinder), respndr)
-	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderItemFinder), respndr)
+	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderActiveFinder), respndr)
 
 	// Router and server.
 	r := mux.NewRouter()
-	r.HandleFunc("/create", createOrderCntrlr.Create)
-	r.HandleFunc("/retrieve/{uuid}", retrieveOrderCntrlr.Retrieve)
+	r.HandleFunc("/order/create", createOrderCntrlr.Create)
+	r.HandleFunc("/order/retrieve/{uuid}", retrieveOrderCntrlr.Retrieve)
 	r.HandleFunc("/add-product", addProductCntrl.AddProduct).Methods("POST")
 	r.HandleFunc("/product", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
 

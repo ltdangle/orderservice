@@ -24,6 +24,7 @@ func NewCreateOrder(repo write.IOrderSaver) *CreateOrder {
 func (action *CreateOrder) Create(r NewOrderRequest) (*write.Order, error) {
 	order := &write.Order{
 		Uuid:      uuid.New().String(),
+		Status:    "created",
 		CreatedAt: time.Now(),
 	}
 
