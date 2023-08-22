@@ -7,7 +7,7 @@ Prjctr Go course. Mock order service project.
 - validates that products exist in inventory (product service) - DONE! (product service mock)
 - calculates order total - DONE!
 - transfers to payment gateway - "/order/{uuid}/checkout" - DONE!
-- confirms order payment from payment gateway - 
+- confirms order payment from payment gateway - "/order/{uuid}/payment/{paymentUuid}" - DONE!
 - provides order status (as requested from user service, product service, others) - "/retrieve/{uuid}" - DONE!
 
 ## Technical implementation
