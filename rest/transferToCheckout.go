@@ -1,11 +1,9 @@
 package rest
 
 import (
+	"github.com/gorilla/mux"
 	"net/http"
 	"orders/actions"
-	"orders/helpers"
-
-	"github.com/gorilla/mux"
 )
 
 // Create order controller.
@@ -40,7 +38,7 @@ func (c *CheckoutTransfer) Checkout(w http.ResponseWriter, r *http.Request) {
 	type payload struct {
 		Url string
 	}
-	checkoutUrl := c.checkout.Url(helpers.NullStringToString(order.Uuid))
+	checkoutUrl := c.checkout.Url(order)
 
 	c.rspndr.Success(w, payload{Url: checkoutUrl})
 
