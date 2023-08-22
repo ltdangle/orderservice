@@ -63,9 +63,9 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/order/create", createOrderCntrlr.Create).Methods("GET")
 	r.HandleFunc("/order/{uuid}", retrieveOrderCntrlr.Retrieve).Methods("GET")
-	r.HandleFunc("/add-product", addProductCntrl.AddProduct).Methods("POST")
-	r.HandleFunc("/product", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
 	r.HandleFunc("/order/{uuid}/checkout", checkoutCntrlr.Checkout).Methods("GET")
+	r.HandleFunc("/product/add", addProductCntrl.AddProduct).Methods("POST")
+	r.HandleFunc("/product/delete", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
 
 	srv := &http.Server{
 		Handler:      r,

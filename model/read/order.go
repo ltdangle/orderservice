@@ -11,7 +11,8 @@ type Order struct {
 	PaymentId   sql.NullString
 	PaymentDate sql.NullTime
 	Items       []OrderItem
-	Status      string
+	Total       int
+	Status      sql.NullString
 	CreatedAt   sql.NullTime
 }
 
@@ -36,7 +37,7 @@ func NewOrderFinderById(db *sql.DB, orderItemFinder IOrderItemFinderByOrderId) *
 func (f FinderById) Find(uuid string) (*Order, error) {
 	// Prepare a SQL statement
 	stmt, err := f.db.Prepare(`
-SELECT orders.uuid, orders.created_at, p.payment_id, p.date
+SELECT orders.uuid, orders.created_at, orders.status, p.payment_id, p.date
 FROM orders 
 LEFT JOIN payments p 
 ON orders.uuid = p.order_id
@@ -51,7 +52,7 @@ WHERE orders.uuid = ?;
 	row := stmt.QueryRow(uuid)
 
 	var order Order
-	err = row.Scan(&order.Uuid, &order.CreatedAt, &order.PaymentId, &order.PaymentDate)
+	err = row.Scan(&order.Uuid, &order.CreatedAt, &order.Status, &order.PaymentId, &order.PaymentDate)
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +60,11 @@ WHERE orders.uuid = ?;
 	order.Items, err = f.orderItemFinder.Find(uuid)
 	if err != nil {
 		return nil, err
+	}
+
+	// Calculate total.
+	for _, item := range order.Items {
+		order.Total += item.Price
 	}
 
 	return &order, nil
