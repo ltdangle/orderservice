@@ -6,7 +6,7 @@ import (
 )
 
 type Order struct {
-	Uuid       string `gorm:"index;unique"`
+	Uuid       string `gorm:"primaryKey;index;unique"`
 	CustomerId string
 	PaymentId  string
 	Status     string
@@ -16,6 +16,8 @@ type Order struct {
 // IOrderSaver persists order to db, filesystem, etc.
 type IOrderSaver interface {
 	Save(order *Order) error
+	Update(order *Order) error
+	FindById(uuid string) (*Order, error)
 }
 
 // OrderSaver implementation.
@@ -38,4 +40,21 @@ func (repo *OrderSaver) Save(order *Order) error {
 		return result.Error
 	}
 	return nil
+}
+
+func (repo *OrderSaver) Update(order *Order) error {
+	result := repo.orm.Save(order)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (repo *OrderSaver) FindById(uuid string) (*Order, error) {
+	var order Order
+	result := repo.orm.First(&order, "uuid = ?", uuid)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &order, nil
 }

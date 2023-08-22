@@ -6,7 +6,7 @@ import (
 )
 
 type OrderItem struct {
-	Uuid        string `gorm:"index;unique"`
+	Uuid        string `gorm:"primaryKey;index;unique"`
 	OrderId     string
 	ProductId   string
 	Title       string

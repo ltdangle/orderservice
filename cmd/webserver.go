@@ -58,12 +58,14 @@ func main() {
 	modifyOrderCntrlr := rest.NewDeleteProduct(actions.NewProductDeleter(orderModifier, orderItemFinder), respndr)
 	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderActiveFinder), respndr)
 	checkoutCntrlr := rest.NewCheckoutTransfer(actions.NewCheckoutTransfer("http://checkout.url"), retrieveOrderAction, respndr)
+	confirmPmntCntrlr := rest.NewConfirmPayment(actions.NewConfirmPayment(write.NewOrderSaver(orm), orm), respndr)
 
 	// Router and server.
 	r := mux.NewRouter()
 	r.HandleFunc("/order/create", createOrderCntrlr.Create).Methods("GET")
 	r.HandleFunc("/order/{uuid}", retrieveOrderCntrlr.Retrieve).Methods("GET")
 	r.HandleFunc("/order/{uuid}/checkout", checkoutCntrlr.Checkout).Methods("GET")
+	r.HandleFunc("/order/{uuid}/payment/{paymentUuid}", confirmPmntCntrlr.ConfirmPayment).Methods("GET")
 	r.HandleFunc("/product/add", addProductCntrl.AddProduct).Methods("POST")
 	r.HandleFunc("/product/delete", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
 
