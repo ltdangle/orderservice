@@ -48,13 +48,13 @@ func main() {
 
 	// Serializer.
 	s := util.NewGobSerializer()
-	
+
 	// Cache.
-	c := cache.NewCacheRedis("tcp", "127.0.0.1:6379", 10)
+	c := cache.NewCacheRedis("tcp", "127.0.0.1:6379", 10, s)
 
 	// New order controller.
 	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
-	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), s, c, respndr)
+	retrieveOrderCntrlr := rest.NewRetrieveOrder(actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))), c, respndr)
 
 	// Router and server.
 	r := mux.NewRouter()
