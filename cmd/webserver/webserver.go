@@ -1,4 +1,4 @@
-package main
+package webserver
 
 import (
 	"database/sql"
@@ -50,11 +50,11 @@ func main() {
 	orderActiveFinder := read.NewOrderFinderActiveById(mysqlDb)
 
 	// Actions.
-	retrieveOrderAction := actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb)))
+	retrieveOrderAction := actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb)).Find)
 
 	// Controllers.
-	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
-	retrieveOrderCntrlr := rest.NewRetrieveOrder(retrieveOrderAction, respndr)
+	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo.Save), respndr)
+	retrieveOrderCntrlr := rest.NewRetrieveOrder(retrieveOrderAction.Retrieve, respndr)
 	modifyOrderCntrlr := rest.NewDeleteProduct(actions.NewProductDeleter(orderModifier, orderItemFinder), respndr)
 	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderActiveFinder), respndr)
 	checkoutCntrlr := rest.NewCheckoutTransfer(actions.NewCheckoutTransfer("http://checkout.url"), retrieveOrderAction, respndr)

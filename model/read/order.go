@@ -16,6 +16,9 @@ type Order struct {
 	CreatedAt   sql.NullTime
 }
 
+// FindOrder repository function type.
+type FindOrder func(uuid string) (*Order, error)
+// Same as above, but in interface
 type OrderFinderById interface {
 	Find(uuid string) (*Order, error)
 }
@@ -113,3 +116,4 @@ AND uuid = ?;
 
 	return &order, nil
 }
+
