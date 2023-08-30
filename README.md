@@ -10,6 +10,7 @@ Prjctr Go course. Mock order service project.
 - confirms order payment from payment gateway - "/order/{uuid}/payment/{paymentUuid}" - DONE!
 - provides order status (as requested from user service, product service, others) - "/retrieve/{uuid}" - DONE!
 
+- implement DI with Wire (function type injection, ftw) 
 - investigage using GORM raw url for read model retrieveal (null values?)
 - implement html ui with htmx
 
