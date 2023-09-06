@@ -15,6 +15,7 @@ Prjctr Go course. Mock order service project.
 - investigage using GORM raw url for read model retrieveal (null values?)
 - implement html ui with htmx
 - use type receivers (read-only) for write model
+- implement backend data admin (https://go-admin.com, https://github.com/LyricTian/gin-admin)
 
 ## Technical implementation
 - REST API
