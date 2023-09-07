@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func app(orderSaver write.IOrderSaver, sqlDb *sql.DB, dateFormat string, url actions.CheckoutUrl, db *gorm.DB, orderModifier write.IOrderModifier) *webApp {
+func app(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url actions.CheckoutUrl) *webApp {
 	wire.Build(
 		newWebApp,
 		rest.NewCreateOrder,
@@ -32,8 +32,9 @@ func app(orderSaver write.IOrderSaver, sqlDb *sql.DB, dateFormat string, url act
 		actions.NewCheckoutTransfer,
 		read.NewOrderFinderById,
 		read.NewOrderFinderActiveById,
-		//read.NewOrderItemFinderByItemId,
 		read.NewOrderItemFinderById,
+		write.NewOrderSaver,
+		write.NewOrderModifier,
 	)
 	return &webApp{}
 }

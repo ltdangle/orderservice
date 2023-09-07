@@ -21,8 +21,9 @@ import (
 
 // Injectors from wire.go:
 
-func app(orderSaver write.IOrderSaver, sqlDb *sql.DB, dateFormat string, url actions.CheckoutUrl, db *gorm.DB, orderModifier write.IOrderModifier) *webApp {
-	createOrder := actions.NewCreateOrder(orderSaver)
+func app(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url actions.CheckoutUrl) *webApp {
+	iOrderSaver := write.NewOrderSaver(db)
+	createOrder := actions.NewCreateOrder(iOrderSaver)
 	responder := rest.NewResponder(dateFormat)
 	restCreateOrder := rest.NewCreateOrder(createOrder, responder)
 	iOrderItemFinderByOrderId := read.NewOrderItemFinderById(sqlDb)
@@ -31,12 +32,13 @@ func app(orderSaver write.IOrderSaver, sqlDb *sql.DB, dateFormat string, url act
 	restRetrieveOrder := rest.NewRetrieveOrder(retrieveOrder, responder)
 	checkoutTransfer := actions.NewCheckoutTransfer(url)
 	restCheckoutTransfer := rest.NewCheckoutTransfer(checkoutTransfer, retrieveOrder, responder)
-	confirmPayment := actions.NewConfirmPayment(orderSaver, db)
+	confirmPayment := actions.NewConfirmPayment(iOrderSaver, db)
 	restConfirmPayment := rest.NewConfirmPayment(confirmPayment, responder)
+	iOrderModifier := write.NewOrderModifier(db)
 	orderFinderActiveById := read.NewOrderFinderActiveById(sqlDb)
-	productAdder := actions.NewProductAdder(orderModifier, orderFinderActiveById)
+	productAdder := actions.NewProductAdder(iOrderModifier, orderFinderActiveById)
 	addProduct := rest.NewAddProduct(productAdder, responder)
-	productDeleter := actions.NewProductDeleter(orderModifier, orderFinderById)
+	productDeleter := actions.NewProductDeleter(iOrderModifier, orderFinderById)
 	deleteProduct := rest.NewDeleteProduct(productDeleter, responder)
 	mainWebApp := newWebApp(restCreateOrder, restRetrieveOrder, restCheckoutTransfer, restConfirmPayment, addProduct, deleteProduct)
 	return mainWebApp

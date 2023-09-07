@@ -27,7 +27,7 @@ type OrderSaver struct {
 }
 
 // NewOrderSaver Constructor.
-func NewOrderSaver(orm *gorm.DB) *OrderSaver {
+func NewOrderSaver(orm *gorm.DB) IOrderSaver {
 	return &OrderSaver{
 		orm:    orm,
 		orders: make(map[string]*Order),

@@ -23,7 +23,7 @@ type OrderModifier struct {
 	orm *gorm.DB
 }
 
-func NewOrderModifier(orm *gorm.DB) *OrderModifier {
+func NewOrderModifier(orm *gorm.DB) IOrderModifier {
 	return &OrderModifier{orm: orm}
 }
 
