@@ -1,26 +1,30 @@
 package actions
 
 import (
+	"errors"
 	"orders/model/read"
 )
 
 // RetrieveOrder action.
 type RetrieveOrder struct {
-	finder read.OrderFinderById
+	findOrder read.FindOrder
 }
 
 // Constructor.
-func NewRetrieveOrder(finder read.OrderFinderById) *RetrieveOrder {
+func NewRetrieveOrder(findOrder read.FindOrder) *RetrieveOrder {
 	return &RetrieveOrder{
-		finder: finder,
+		findOrder: findOrder,
 	}
 }
 
 func (action *RetrieveOrder) Retrieve(uuid string) (*read.Order, error) {
-	order, err := action.finder.Find(uuid)
+	order, err := action.findOrder(uuid)
 	if err != nil {
 		return nil, err
 	}
 
+	if order == nil {
+		return nil, errors.New("order is nil")
+	}
 	return order, nil
 }

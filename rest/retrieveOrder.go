@@ -1,22 +1,23 @@
 package rest
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
-	"orders/actions"
+	"orders/model/read"
+
+	"github.com/gorilla/mux"
 )
 
 // Create order controller.
 type RetrieveOrder struct {
-	action *actions.RetrieveOrder
-	rspndr *Responder
+	findOrder read.FindOrder
+	rspndr    *Responder
 }
 
 // Constructor.
-func NewRetrieveOrder(action *actions.RetrieveOrder, rspndr *Responder) *RetrieveOrder {
+func NewRetrieveOrder(findOrder read.FindOrder, rspndr *Responder) *RetrieveOrder {
 	return &RetrieveOrder{
-		action: action,
-		rspndr: rspndr,
+		findOrder: findOrder,
+		rspndr:    rspndr,
 	}
 }
 
@@ -24,10 +25,16 @@ func (c *RetrieveOrder) Retrieve(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	uuid := vars["uuid"]
 
-	order, err := c.action.Retrieve(uuid)
+	order, err := c.findOrder(uuid)
 
 	if err != nil {
 		c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if order == nil {
+		c.rspndr.Error(w, http.StatusInternalServerError, "order is nil")
+		return
 	}
 
 	c.rspndr.Success(w, order)

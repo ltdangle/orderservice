@@ -10,6 +10,13 @@ Prjctr Go course. Mock order service project.
 - confirms order payment from payment gateway - "/order/{uuid}/payment/{paymentUuid}" - DONE!
 - provides order status (as requested from user service, product service, others) - "/retrieve/{uuid}" - DONE!
 
+## TODO
+- implement DI with Wire (function type injection, ftw) 
+- investigage using GORM raw url for read model retrieveal (null values?)
+- implement html ui with htmx
+- use type receivers (read-only) for write model
+- implement backend data admin (https://go-admin.com, https://github.com/LyricTian/gin-admin)
+
 ## Technical implementation
 - REST API
 - uses repository pattern for entity persistence
