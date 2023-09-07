@@ -2,19 +2,17 @@ package main
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"log"
-	"net/http"
 	"orders/actions"
 	"orders/model/read"
 	"orders/model/write"
 	"orders/rest"
 	"os"
-	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -60,22 +58,6 @@ func main() {
 	checkoutCntrlr := rest.NewCheckoutTransfer(actions.NewCheckoutTransfer("http://checkout.url"), retrieveOrderAction, respndr)
 	confirmPmntCntrlr := rest.NewConfirmPayment(actions.NewConfirmPayment(write.NewOrderSaver(orm), orm), respndr)
 
-	// Router and server.
-	r := mux.NewRouter()
-	r.HandleFunc("/order/create", createOrderCntrlr.Create).Methods("GET")
-	r.HandleFunc("/order/{uuid}", retrieveOrderCntrlr.Retrieve).Methods("GET")
-	r.HandleFunc("/order/{uuid}/checkout", checkoutCntrlr.Checkout).Methods("GET")
-	r.HandleFunc("/order/{uuid}/payment/{paymentUuid}", confirmPmntCntrlr.ConfirmPayment).Methods("GET")
-	r.HandleFunc("/product/add", addProductCntrl.AddProduct).Methods("POST")
-	r.HandleFunc("/product/delete", modifyOrderCntrlr.DeleteProduct).Methods("DELETE")
-
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         "127.0.0.1:8081",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	log.Fatal(srv.ListenAndServe())
-
+	app := NewWebApp(createOrderCntrlr, retrieveOrderCntrlr, checkoutCntrlr, confirmPmntCntrlr, addProductCntrl, modifyOrderCntrlr)
+	app.run()
 }
