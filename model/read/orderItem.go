@@ -25,7 +25,7 @@ type OrderItemFinderById struct {
 }
 
 // NewOrderItemFinderById Constructor.
-func NewOrderItemFinderById(db *sql.DB) *OrderItemFinderById {
+func NewOrderItemFinderById(db *sql.DB) IOrderItemFinderByOrderId {
 	return &OrderItemFinderById{
 		db: db,
 	}

@@ -5,14 +5,15 @@ import (
 	"orders/model/read"
 )
 
+type CheckoutUrl string
 type CheckoutTransfer struct {
-	u string
+	u CheckoutUrl
 }
 
-func NewCheckoutTransfer(url string) *CheckoutTransfer {
+func NewCheckoutTransfer(url CheckoutUrl) *CheckoutTransfer {
 	return &CheckoutTransfer{u: url}
 }
 
 func (c *CheckoutTransfer) Url(order *read.Order) string {
-	return c.u + fmt.Sprintf("?cart=%s&total=%d", order.Uuid.String, order.Total)
+	return string(c.u) + fmt.Sprintf("?cart=%s&total=%d", order.Uuid.String, order.Total)
 }

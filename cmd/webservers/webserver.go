@@ -58,6 +58,6 @@ func main() {
 	checkoutCntrlr := rest.NewCheckoutTransfer(actions.NewCheckoutTransfer("http://checkout.url"), retrieveOrderAction, respndr)
 	confirmPmntCntrlr := rest.NewConfirmPayment(actions.NewConfirmPayment(write.NewOrderSaver(orm), orm), respndr)
 
-	app := NewWebApp(createOrderCntrlr, retrieveOrderCntrlr, checkoutCntrlr, confirmPmntCntrlr, addProductCntrl, modifyOrderCntrlr)
+	app := newWebApp(createOrderCntrlr, retrieveOrderCntrlr, checkoutCntrlr, confirmPmntCntrlr, addProductCntrl, modifyOrderCntrlr)
 	app.run()
 }

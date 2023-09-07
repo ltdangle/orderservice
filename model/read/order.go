@@ -27,7 +27,7 @@ type FinderById struct {
 }
 
 // NewOrderFinderById NewSqlOrderRepo Constructor.
-func NewOrderFinderById(db *sql.DB, orderItemFinder IOrderItemFinderByOrderId) *FinderById {
+func NewOrderFinderById(db *sql.DB, orderItemFinder IOrderItemFinderByOrderId) OrderFinderById {
 	return &FinderById{
 		db:              db,
 		orderItemFinder: orderItemFinder,
@@ -78,7 +78,7 @@ type FinderActiveById struct {
 	db *sql.DB
 }
 
-func NewOrderFinderActiveById(db *sql.DB) *FinderActiveById {
+func NewOrderFinderActiveById(db *sql.DB) OrderFinderActiveById {
 	return &FinderActiveById{
 		db: db,
 	}

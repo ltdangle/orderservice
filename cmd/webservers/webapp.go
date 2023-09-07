@@ -18,7 +18,7 @@ type webApp struct {
 	modifyOrderCntrlr   *rest.DeleteProduct
 }
 
-func NewWebApp(
+func newWebApp(
 	createOrderCntrlr *rest.CreateOrder,
 	retrieveOrderCntrlr *rest.RetrieveOrder,
 	checkoutCntrlr *rest.CheckoutTransfer,
