@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func app(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url actions.CheckoutUrl) *webApp {
+func build(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url actions.CheckoutUrl) *webApp {
 	wire.Build(
 		newWebApp,
 		rest.NewCreateOrder,

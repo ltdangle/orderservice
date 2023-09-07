@@ -3,10 +3,6 @@ package main
 import (
 	"database/sql"
 	"log"
-	"orders/actions"
-	"orders/model/read"
-	"orders/model/write"
-	"orders/rest"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -31,10 +27,6 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	repo := write.NewOrderSaver(orm)
-
-	// Rest json responder.
-	respndr := rest.NewResponder("2006-01-02 15:04:05")
 
 	// Mysql orm connection.
 	mysqlDb, errr := sql.Open("mysql", mysqlDsn)
@@ -42,22 +34,6 @@ func main() {
 		log.Fatal(errr.Error())
 	}
 
-	// Model read/write implementations.
-	orderModifier := write.NewOrderModifier(orm)
-	orderItemFinder := read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb))
-	orderActiveFinder := read.NewOrderFinderActiveById(mysqlDb)
-
-	// Actions.
-	retrieveOrderAction := actions.NewRetrieveOrder(read.NewOrderFinderById(mysqlDb, read.NewOrderItemFinderById(mysqlDb)))
-
-	// Controllers.
-	createOrderCntrlr := rest.NewCreateOrder(actions.NewCreateOrder(repo), respndr)
-	retrieveOrderCntrlr := rest.NewRetrieveOrder(retrieveOrderAction, respndr)
-	modifyOrderCntrlr := rest.NewDeleteProduct(actions.NewProductDeleter(orderModifier, orderItemFinder), respndr)
-	addProductCntrl := rest.NewAddProduct(actions.NewProductAdder(orderModifier, orderActiveFinder), respndr)
-	checkoutCntrlr := rest.NewCheckoutTransfer(actions.NewCheckoutTransfer("http://checkout.url"), retrieveOrderAction, respndr)
-	confirmPmntCntrlr := rest.NewConfirmPayment(actions.NewConfirmPayment(write.NewOrderSaver(orm), orm), respndr)
-
-	app := newWebApp(createOrderCntrlr, retrieveOrderCntrlr, checkoutCntrlr, confirmPmntCntrlr, addProductCntrl, modifyOrderCntrlr)
+	app := build(mysqlDb, orm, "2006-01-02 15:04:05", "http://checkout.url")
 	app.run()
 }
