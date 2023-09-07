@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load("../../.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -34,6 +34,6 @@ func main() {
 		log.Fatal(errr.Error())
 	}
 
-	app := build(mysqlDb, orm, "2006-01-02 15:04:05", "http://checkout.url")
+	app := buildDependencies(mysqlDb, orm, "2006-01-02 15:04:05", "http://checkout.url")
 	app.run()
 }

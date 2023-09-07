@@ -21,7 +21,7 @@ import (
 
 // Injectors from wire.go:
 
-func build(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url actions.CheckoutUrl) *webApp {
+func buildDependencies(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url actions.CheckoutUrl) *webApp {
 	iOrderSaver := write.NewOrderSaver(db)
 	createOrder := actions.NewCreateOrder(iOrderSaver)
 	responder := rest.NewResponder(dateFormat)
