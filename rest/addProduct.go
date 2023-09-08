@@ -8,14 +8,11 @@ import (
 	"orders/infra"
 )
 
+//go:generate newc
 type AddProduct struct {
 	action *actions.ProductAdder
 	rspndr *Responder
 	logger infra.Logger
-}
-
-func NewAddProduct(action *actions.ProductAdder, rspndr *Responder, logger infra.Logger) *AddProduct {
-	return &AddProduct{action: action, rspndr: rspndr, logger: logger}
 }
 
 func (c *AddProduct) AddProduct(w http.ResponseWriter, r *http.Request) {

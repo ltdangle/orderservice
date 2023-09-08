@@ -1,25 +1,19 @@
 package rest
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"orders/actions"
+	"orders/infra"
+
+	"github.com/gorilla/mux"
 )
 
-// Create order controller.
+//go:generate newc
 type CheckoutTransfer struct {
 	retrieve *actions.RetrieveOrder
 	checkout *actions.CheckoutTransfer
 	rspndr   *Responder
-}
-
-// Constructor.
-func NewCheckoutTransfer(checkout *actions.CheckoutTransfer, retrieve *actions.RetrieveOrder, rspndr *Responder) *CheckoutTransfer {
-	return &CheckoutTransfer{
-		retrieve: retrieve,
-		checkout: checkout,
-		rspndr:   rspndr,
-	}
+	logger   infra.Logger
 }
 
 func (c *CheckoutTransfer) Checkout(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +24,7 @@ func (c *CheckoutTransfer) Checkout(w http.ResponseWriter, r *http.Request) {
 	order, err := c.retrieve.Retrieve(uuid)
 
 	if err != nil {
+		c.logger.Log("rest/transferToCheckout: " + err.Error())
 		c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -40,6 +35,7 @@ func (c *CheckoutTransfer) Checkout(w http.ResponseWriter, r *http.Request) {
 	}
 	checkoutUrl := c.checkout.Url(order)
 
+	c.logger.Log("rest/transferToCheckout: transfer to checkout url " + string(checkoutUrl))
 	c.rspndr.Success(w, payload{Url: checkoutUrl})
 
 }

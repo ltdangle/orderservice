@@ -1,23 +1,21 @@
 package rest
 
 import (
-	"github.com/gorilla/mux"
+	"fmt"
 	"net/http"
 	"orders/actions"
+	"orders/infra"
+
+	"github.com/gorilla/mux"
 )
 
 // Create order controller.
+//
+//go:generate newc
 type RetrieveOrder struct {
 	action *actions.RetrieveOrder
 	rspndr *Responder
-}
-
-// Constructor.
-func NewRetrieveOrder(action *actions.RetrieveOrder, rspndr *Responder) *RetrieveOrder {
-	return &RetrieveOrder{
-		action: action,
-		rspndr: rspndr,
-	}
+	logger infra.Logger
 }
 
 func (c *RetrieveOrder) Retrieve(w http.ResponseWriter, r *http.Request) {
@@ -27,8 +25,11 @@ func (c *RetrieveOrder) Retrieve(w http.ResponseWriter, r *http.Request) {
 	order, err := c.action.Retrieve(uuid)
 
 	if err != nil {
+		c.logger.Log("rest/retrieveOrder: " + err.Error())
 		c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
+	c.logger.Log(fmt.Sprintf("rest/retrieveOrder: %v", order))
 	c.rspndr.Success(w, order)
 }

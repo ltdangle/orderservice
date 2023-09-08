@@ -2,21 +2,17 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"orders/actions"
+	"orders/infra"
 )
 
+//go:generate newc
 type DeleteProduct struct {
 	action *actions.ProductDeleter
 	rspndr *Responder
-}
-
-// Constructor.
-func NewDeleteProduct(action *actions.ProductDeleter, rspndr *Responder) *DeleteProduct {
-	return &DeleteProduct{
-		action: action,
-		rspndr: rspndr,
-	}
+	logger infra.Logger
 }
 
 func (c *DeleteProduct) DeleteProduct(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +20,7 @@ func (c *DeleteProduct) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
+		c.logger.Log("rest/deleteProduct: " + err.Error())
 		c.rspndr.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -32,12 +29,15 @@ func (c *DeleteProduct) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err.Error() == "item not found" {
+			c.logger.Log("rest/deleteProduct: " + err.Error())
 			c.rspndr.Error(w, http.StatusBadRequest, err.Error())
 			return
 		}
+		c.logger.Log("rest/deleteProduct: " + err.Error())
 		c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	c.logger.Log(fmt.Sprintf("rest/deleteProduct: %v", request))
 	c.rspndr.Success(w, "")
 }
