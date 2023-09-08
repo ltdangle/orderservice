@@ -2,20 +2,20 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"orders/actions"
+	"orders/infra"
 )
 
 type AddProduct struct {
 	action *actions.ProductAdder
 	rspndr *Responder
+	logger infra.Logger
 }
 
-func NewAddProduct(action *actions.ProductAdder, rspndr *Responder) *AddProduct {
-	return &AddProduct{
-		action: action,
-		rspndr: rspndr,
-	}
+func NewAddProduct(action *actions.ProductAdder, rspndr *Responder, logger infra.Logger) *AddProduct {
+	return &AddProduct{action: action, rspndr: rspndr, logger: logger}
 }
 
 func (c *AddProduct) AddProduct(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +24,7 @@ func (c *AddProduct) AddProduct(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		c.rspndr.Error(w, http.StatusBadRequest, err.Error())
+		c.logger.Log("rest/addProduct: " + err.Error())
 		return
 	}
 
@@ -32,11 +33,14 @@ func (c *AddProduct) AddProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err.Error() == "order not found" {
 			c.rspndr.Error(w, http.StatusBadRequest, err.Error())
+			c.logger.Log("rest/addProduct: " + err.Error())
 			return
 		}
 		c.rspndr.Error(w, http.StatusInternalServerError, err.Error())
+		c.logger.Log("rest/addProduct: " + err.Error())
 		return
 	}
 
 	c.rspndr.Success(w, item)
+	c.logger.Log(fmt.Sprintf("rest/addProduct: %v", request))
 }

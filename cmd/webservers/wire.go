@@ -4,6 +4,7 @@
 package main
 
 import (
+	"orders/infra"
 	"database/sql"
 	"orders/actions"
 	"orders/model/read"
@@ -35,6 +36,7 @@ func buildDependencies(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url action
 		read.NewOrderItemFinderById,
 		write.NewOrderSaver,
 		write.NewOrderModifier,
+		infra.NewSimpleLogger,
 	)
 	return &webApp{}
 }

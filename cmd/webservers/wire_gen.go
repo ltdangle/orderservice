@@ -10,6 +10,7 @@ import (
 	"database/sql"
 	"gorm.io/gorm"
 	"orders/actions"
+	"orders/infra"
 	"orders/model/read"
 	"orders/model/write"
 	"orders/rest"
@@ -37,7 +38,8 @@ func buildDependencies(sqlDb *sql.DB, db *gorm.DB, dateFormat string, url action
 	iOrderModifier := write.NewOrderModifier(db)
 	orderFinderActiveById := read.NewOrderFinderActiveById(sqlDb)
 	productAdder := actions.NewProductAdder(iOrderModifier, orderFinderActiveById)
-	addProduct := rest.NewAddProduct(productAdder, responder)
+	logger := infra.NewSimpleLogger()
+	addProduct := rest.NewAddProduct(productAdder, responder, logger)
 	productDeleter := actions.NewProductDeleter(iOrderModifier, orderFinderById)
 	deleteProduct := rest.NewDeleteProduct(productDeleter, responder)
 	mainWebApp := newWebApp(restCreateOrder, restRetrieveOrder, restCheckoutTransfer, restConfirmPayment, addProduct, deleteProduct)
